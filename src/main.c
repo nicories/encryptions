@@ -18,8 +18,7 @@ int base64_to_bin(char c) {
   }
   return -1;
 }
-char *decode_base64(char *text) {
-  char* buffer = malloc(sizeof(char) * BUFFER_SIZE);
+int decode_base64(char *text, char* buffer) {
   int times = (strlen(text) + 4 - 1) / 4;
 
   char c1,c2,c3;
@@ -47,10 +46,10 @@ char *decode_base64(char *text) {
     buffer[i * 3 + 1] = c2;
     buffer[i * 3 + 2] = c3;
   }
-  return buffer;
+  buffer[times * 3] = '\0';
+  return 1;
 }
-char *encode_base64(char *text) {
-  char *buffer = malloc(sizeof(char) * BUFFER_SIZE);
+int encode_base64(char *text, char* buffer) {
 
   int times = (strlen(text) + 3 - 1) / 3;
   // split into char triplets
@@ -88,10 +87,10 @@ char *encode_base64(char *text) {
     buffer[4 * i + 2] = base64_table[c3];
     buffer[4 * i + 3] = base64_table[c4];
   }
-  return buffer;
+  buffer[4 * times] = '\0';
+  return 1;
 }
-char *encrypt_caesar(char *text, int key) {
-  char *buffer = malloc(sizeof(char) * BUFFER_SIZE);
+int encrypt_caesar(char *text, int key, char* buffer) {
   int i = 0;
   while (text[i] != '\0') {
     int new = text[i] + key;
@@ -104,9 +103,10 @@ char *encrypt_caesar(char *text, int key) {
     buffer[i] = new;
     i++;
   }
-  return buffer;
+  buffer[i] = '\0';
+  return 1;
 }
-char *decrypt_caesar(char *text, int key) { return encrypt_caesar(text, -key); }
+int decrypt_caesar(char *text, int key, char* buffer) { encrypt_caesar(text, -key, buffer); return 1; }
 
 #ifdef TEST
 void run_tests();
@@ -117,29 +117,69 @@ int main(int argc, char *argv[]) {
 #endif
 }
 
+int test_string_equal(char *str1, char *str2) {
+  if (strcmp(str1, str2) == 0) {
+    return 1;
+  }
+  printf("%s != %s\n", str1, str2);
+  return 0;
+}
+
 #ifdef TEST
 void run_tests() {
   printf("running tests\n");
-  assert(strcmp(encrypt_caesar("abc", 3), "def") == 0);
-  assert(strcmp(encrypt_caesar("yza", 1), "zab") == 0);
+  char buffer[BUFFER_SIZE];
 
-  assert(strcmp(decrypt_caesar("def", 3), "abc") == 0);
-  assert(strcmp(decrypt_caesar("zab", 1), "yza") == 0);
-
+  // encode base64 tests
   // test values from https://www.cryptool.org/en/cto-codings/base64
-  assert(strcmp(encode_base64("a"), "YQ==") == 0);
-  assert(strcmp(encode_base64("abc"), "YWJj") == 0);
-  assert(strcmp(encode_base64("KDA"), "S0RB") == 0);
-  assert(strcmp(encode_base64("ABBA"), "QUJCQQ==") == 0);
-  assert(strcmp(encode_base64("sajkASjfhkAShjsdajha"),
-                "c2Fqa0FTamZoa0FTaGpzZGFqaGE=") == 0);
+  encode_base64("a", buffer);
+  assert(test_string_equal(buffer, "YQ=="));
 
-  assert(strcmp(decode_base64("YWJj"), "abc") == 0);
-  assert(strcmp(decode_base64("YQ=="), "a") == 0);
-  assert(strcmp(decode_base64("QUJCQQ=="), "ABBA") == 0);
-  assert(strcmp(decode_base64("YTV4MQ=="), "a5x1") == 0);
-  assert(strcmp(decode_base64("c2Fqa0FTamZoa0FTaGpzZGFqaGE="),
-                "sajkASjfhkAShjsdajha") == 0);
+  encode_base64("abc", buffer);
+  assert(test_string_equal(buffer, "YWJj"));
+
+  encode_base64("KDA", buffer);
+  assert(test_string_equal(buffer, "S0RB"));
+
+  encode_base64("gaAfb", buffer);
+  assert(test_string_equal(buffer, "Z2FBZmI="));
+
+  encode_base64("ABBA", buffer);
+  assert(test_string_equal(buffer, "QUJCQQ=="));
+
+  encode_base64("sajkASjfhkAShjsdajha", buffer);
+  assert(test_string_equal(buffer, "c2Fqa0FTamZoa0FTaGpzZGFqaGE="));
+
+  // decode base64 tests
+  decode_base64("YWJj", buffer);
+  assert(test_string_equal(buffer, "abc"));
+
+  decode_base64("YQ==", buffer);
+  assert(test_string_equal(buffer, "a"));
+
+  decode_base64("QUJCQQ==", buffer);
+  assert(test_string_equal(buffer, "ABBA"));
+
+  decode_base64("YTV4MQ==", buffer);
+  assert(test_string_equal(buffer, "a5x1"));
+
+  decode_base64("c2Fqa0FTamZoa0FTaGpzZGFqaGE=", buffer);
+  assert(test_string_equal(buffer, "sajkASjfhkAShjsdajha"));
+
+  // caesar encrypt tests
+  encrypt_caesar("abc", 3, buffer);
+  assert(test_string_equal(buffer, "def"));
+
+  encrypt_caesar("yza", 1, buffer);
+  assert(test_string_equal(buffer, "zab"));
+
+  // caesar decrypt tests
+  decrypt_caesar("def", 3, buffer);
+  assert(test_string_equal(buffer, "abc"));
+
+  decrypt_caesar("zab", 1, buffer);
+  assert(test_string_equal(buffer, "yza"));
+
   printf("tests finished\n");
 }
 
