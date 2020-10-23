@@ -1,12 +1,12 @@
-cc = gcc -Wall -std=c11
+cc = gcc -Wall -std=c11 -ggdb
 all: bin/main
 	./bin/main
 bin/main: src/main.c
 	mkdir -p bin
 	$(cc) $^ -o $@
-bin/test: src/main.c
+bin/test: src/test.c
 	mkdir -p bin
-	$(cc) -D TEST $^ -o $@
+	$(cc) $^ -o $@
 test: bin/test
 	./bin/test
 .PHONY: clean
