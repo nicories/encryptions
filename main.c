@@ -93,7 +93,7 @@ char *encode_base64(char *text) {
   }
   return buffer;
 }
-char *encode_caesar(char *text, int key) {
+char *encrypt_caesar(char *text, int key) {
   /* printf("%s\n", text); */
   char *buffer = malloc(sizeof(char) * BUFFER_SIZE);
   int i = 0;
@@ -110,13 +110,13 @@ char *encode_caesar(char *text, int key) {
   }
   return buffer;
 }
-char *decode_caesar(char *text, int key) { return encode_caesar(text, -key); }
+char *decrypt_caesar(char *text, int key) { return encrypt_caesar(text, -key); }
 int main(int argc, char *argv[]) {
-  assert(strcmp(encode_caesar("abc", 3), "def") == 0);
-  assert(strcmp(encode_caesar("yza", 1), "zab") == 0);
+  assert(strcmp(encrypt_caesar("abc", 3), "def") == 0);
+  assert(strcmp(encrypt_caesar("yza", 1), "zab") == 0);
 
-  assert(strcmp(decode_caesar("def", 3), "abc") == 0);
-  assert(strcmp(decode_caesar("zab", 1), "yza") == 0);
+  assert(strcmp(decrypt_caesar("def", 3), "abc") == 0);
+  assert(strcmp(decrypt_caesar("zab", 1), "yza") == 0);
 
   // test values from https://www.cryptool.org/en/cto-codings/base64
   assert(strcmp(encode_base64("a"), "YQ==") == 0);
