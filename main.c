@@ -19,7 +19,7 @@ int base64_to_bin(char c) {
   }
   return -1;
 }
-char* decrypt_base64(char* text) {
+char *decode_base64(char *text) {
   char* buffer = malloc(sizeof(char) * BUFFER_SIZE);
   int times = (strlen(text) + 4 - 1) / 4;
 
@@ -52,7 +52,7 @@ char* decrypt_base64(char* text) {
   printf("%s\n", buffer);
   return buffer;
 }
-char *encrypt_base64(char *text) {
+char *encode_base64(char *text) {
   char *buffer = malloc(sizeof(char) * BUFFER_SIZE);
 
   int times = (strlen(text) + 3 - 1) / 3;
@@ -93,7 +93,7 @@ char *encrypt_base64(char *text) {
   }
   return buffer;
 }
-char *encrypt_caesar(char *text, int key) {
+char *encode_caesar(char *text, int key) {
   /* printf("%s\n", text); */
   char *buffer = malloc(sizeof(char) * BUFFER_SIZE);
   int i = 0;
@@ -110,26 +110,26 @@ char *encrypt_caesar(char *text, int key) {
   }
   return buffer;
 }
-char *decrypt_caesar(char *text, int key) { return encrypt_caesar(text, -key); }
+char *decode_caesar(char *text, int key) { return encode_caesar(text, -key); }
 int main(int argc, char *argv[]) {
-  assert(strcmp(encrypt_caesar("abc", 3), "def") == 0);
-  assert(strcmp(encrypt_caesar("yza", 1), "zab") == 0);
+  assert(strcmp(encode_caesar("abc", 3), "def") == 0);
+  assert(strcmp(encode_caesar("yza", 1), "zab") == 0);
 
-  assert(strcmp(decrypt_caesar("def", 3), "abc") == 0);
-  assert(strcmp(decrypt_caesar("zab", 1), "yza") == 0);
+  assert(strcmp(decode_caesar("def", 3), "abc") == 0);
+  assert(strcmp(decode_caesar("zab", 1), "yza") == 0);
 
   // test values from https://www.cryptool.org/en/cto-codings/base64
-  assert(strcmp(encrypt_base64("a"), "YQ==") == 0);
-  assert(strcmp(encrypt_base64("abc"), "YWJj") == 0);
-  assert(strcmp(encrypt_base64("KDA"), "S0RB") == 0);
-  assert(strcmp(encrypt_base64("ABBA"), "QUJCQQ==") == 0);
-  assert(strcmp(encrypt_base64("sajkASjfhkAShjsdajha"),
+  assert(strcmp(encode_base64("a"), "YQ==") == 0);
+  assert(strcmp(encode_base64("abc"), "YWJj") == 0);
+  assert(strcmp(encode_base64("KDA"), "S0RB") == 0);
+  assert(strcmp(encode_base64("ABBA"), "QUJCQQ==") == 0);
+  assert(strcmp(encode_base64("sajkASjfhkAShjsdajha"),
                 "c2Fqa0FTamZoa0FTaGpzZGFqaGE=") == 0);
 
-  assert(strcmp(decrypt_base64("YWJj"), "abc") == 0);
-  assert(strcmp(decrypt_base64("YQ=="), "a") == 0);
-  assert(strcmp(decrypt_base64("QUJCQQ=="), "ABBA") == 0);
-  assert(strcmp(decrypt_base64("YTV4MQ=="), "a5x1") == 0);
-  assert(strcmp(decrypt_base64("c2Fqa0FTamZoa0FTaGpzZGFqaGE="),
+  assert(strcmp(decode_base64("YWJj"), "abc") == 0);
+  assert(strcmp(decode_base64("YQ=="), "a") == 0);
+  assert(strcmp(decode_base64("QUJCQQ=="), "ABBA") == 0);
+  assert(strcmp(decode_base64("YTV4MQ=="), "a5x1") == 0);
+  assert(strcmp(decode_base64("c2Fqa0FTamZoa0FTaGpzZGFqaGE="),
                 "sajkASjfhkAShjsdajha") == 0);
 }
