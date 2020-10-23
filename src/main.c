@@ -13,7 +13,6 @@ static char base64_table[] = {
 int base64_to_bin(char c) {
   for (int i = 0; i < 300; i++) {
     if (base64_table[i] == c) {
-      printf("%c == %d\n", c, i);
       return i;
     }
   }
@@ -48,8 +47,6 @@ char *decode_base64(char *text) {
     buffer[i * 3 + 1] = c2;
     buffer[i * 3 + 2] = c3;
   }
-  /* printf("%x %x %x\n", buffer[0], buffer[1], buffer[2]); */
-  printf("%s\n", buffer);
   return buffer;
 }
 char *encode_base64(char *text) {
@@ -94,7 +91,6 @@ char *encode_base64(char *text) {
   return buffer;
 }
 char *encrypt_caesar(char *text, int key) {
-  /* printf("%s\n", text); */
   char *buffer = malloc(sizeof(char) * BUFFER_SIZE);
   int i = 0;
   while (text[i] != '\0') {
@@ -111,7 +107,19 @@ char *encrypt_caesar(char *text, int key) {
   return buffer;
 }
 char *decrypt_caesar(char *text, int key) { return encrypt_caesar(text, -key); }
+
+#ifdef TEST
+void run_tests();
+#endif
 int main(int argc, char *argv[]) {
+#ifdef TEST
+  run_tests();
+#endif
+}
+
+#ifdef TEST
+void run_tests() {
+  printf("running tests\n");
   assert(strcmp(encrypt_caesar("abc", 3), "def") == 0);
   assert(strcmp(encrypt_caesar("yza", 1), "zab") == 0);
 
@@ -132,4 +140,7 @@ int main(int argc, char *argv[]) {
   assert(strcmp(decode_base64("YTV4MQ=="), "a5x1") == 0);
   assert(strcmp(decode_base64("c2Fqa0FTamZoa0FTaGpzZGFqaGE="),
                 "sajkASjfhkAShjsdajha") == 0);
+  printf("tests finished\n");
 }
+
+#endif
